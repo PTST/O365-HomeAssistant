@@ -263,6 +263,8 @@ class O365AuthCallbackView(HomeAssistantView):
 
     @callback
     def get(self, request):
+        from aiohttp import web_response
+
         """Receive authorization token."""
         hass = request.app["hass"]
         _LOGGER.info(request.fields)
