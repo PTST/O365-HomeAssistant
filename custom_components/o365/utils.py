@@ -37,14 +37,16 @@ def clean_html(html):
 
 def validate_permissions(token_path=DEFAULT_CACHE_PATH, token_filename="o365.token"):
     full_token_path = os.path.join(token_path, token_filename)
-    if not os.path.exists(full_token_path) or not os.path.isfile(full_token_path):
+    if not (
+        os.path.exists(full_token_path) and os.path.isfile(full_token_path)
+    ):
         _LOGGER.warning(f"Could not loacte token at {full_token_path}")
         return False
     with open(full_token_path, "r", encoding="UTF-8") as fh:
         raw = fh.read()
         permissions = json.loads(raw)["scope"]
     scope = [x for x in MINIMUM_REQUIRED_SCOPES]
-    all_permissions_granted = all([x in permissions for x in scope])
+    all_permissions_granted = all(x in permissions for x in scope)
     if not all_permissions_granted:
         _LOGGER.warning(f"All permissions granted: {all_permissions_granted}")
     return all_permissions_granted
@@ -191,7 +193,7 @@ def load_calendars(path):
 
 def get_calendar_info(hass, calendar, track_new_devices):
     """Convert data from O365 into DEVICE_SCHEMA."""
-    calendar_info = CALENDAR_DEVICE_SCHEMA(
+    return CALENDAR_DEVICE_SCHEMA(
         {
             CONF_CAL_ID: calendar.calendar_id,
             CONF_ENTITIES: [
@@ -203,7 +205,6 @@ def get_calendar_info(hass, calendar, track_new_devices):
             ],
         }
     )
-    return calendar_info
 
 
 def update_calendar_file(path, calendar, hass, track_new_devices):
