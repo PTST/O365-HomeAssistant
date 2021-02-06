@@ -54,7 +54,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         return False
 
     conf = config.get(DOMAIN, {})
-    if conf.get(CONF_CALENDAR_ACCESS) is not FeatureAccess.Disabled:
+    if conf.get(CONF_CALENDAR_ACCESS) is FeatureAccess.Disabled:
         return False
 
     calendar_services = CalendarServices(account, track_new, hass)
@@ -74,6 +74,10 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
             devices.append(cal)
     add_devices(devices, True)
 
+    hass.services.register(
+        DOMAIN, "scan_for_calendars", calendar_services.scan_for_calendars
+    )
+
     if conf.get(CONF_CALENDAR_ACCESS) is FeatureAccess.ReadWrite:
         hass.services.register(
             DOMAIN, "modify_calendar_event", calendar_services.modify_calendar_event
@@ -86,10 +90,6 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         )
         hass.services.register(
             DOMAIN, "respond_calendar_event", calendar_services.respond_calendar_event
-        )
-    if conf.get(CONF_CALENDAR_ACCESS) is not FeatureAccess.Disabled:
-        hass.services.register(
-            DOMAIN, "scan_for_calendars", calendar_services.scan_for_calendars
         )
 
     return True

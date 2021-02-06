@@ -62,7 +62,7 @@ def get_scopes(conf):
 def validate_permissions(scopes, token_path=DEFAULT_CACHE_PATH, token_filename="o365.token"):
     full_token_path = os.path.join(token_path, token_filename)
     if not os.path.exists(full_token_path) or not os.path.isfile(full_token_path):
-        _LOGGER.warning(f"Could not loacte token at {full_token_path}")
+        _LOGGER.warning(f"Could not locate token at {full_token_path}")
         return False
     with open(full_token_path, "r", encoding="UTF-8") as fh:
         raw = fh.read()
