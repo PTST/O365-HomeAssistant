@@ -13,6 +13,7 @@ from .const import (
     ATTR_ZIP_ATTACHMENTS,
     ATTR_ZIP_NAME,
     NOTIFY_BASE_SCHEMA,
+    CONF_EMAIL_WRITE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,6 +25,9 @@ async def async_get_service(hass, config, discovery_info=None):
     account = hass.data[DOMAIN]["account"]
     is_authenticated = account.is_authenticated
     if not is_authenticated:
+        return
+    conf = config.get(DOMAIN, {})
+    if not conf.get(CONF_EMAIL_WRITE, True):
         return
     email_service = O365EmailService(account)
     return email_service

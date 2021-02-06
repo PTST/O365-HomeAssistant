@@ -76,6 +76,10 @@ CONF_QUERY_SENSORS = "query_sensors"
 CONF_SUBJECT_CONTAINS = "subject_contains"
 CONF_SUBJECT_IS = "subject_is"
 CONF_TRACK_NEW = "track_new_calendar"
+CONF_CALENDAR_READ = "calendar_read"
+CONF_CALENDAR_WRITE = "calendar_write"
+CONF_EMAIL_READ = "email_read"
+CONF_EMAIL_WRITE = "email_write"
 CONFIG_BASE_DIR = get_default_config_dir()
 CONFIGURATOR_DESCRIPTION = (
     "To link your O365 account, click the link, login, and authorize:"
@@ -91,21 +95,27 @@ DOMAIN = "o365"
 ICON = "mdi:office"
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=15)
 DEFAULT_OFFSET = "!!"
-SCOPE = [
+BASE_SCOPES = [
     "offline_access",
     "User.Read",
+]
+CALENDAR_READ_SCOPES = [
+    "Calendars.Read",
+    "Calendars.Read.Shared",
+]
+CALENDAR_READ_WRITE_SCOPES = [
     "Calendars.ReadWrite",
     "Calendars.ReadWrite.Shared",
+]
+EMAIL_READ_SCOPES = [
+    "Mail.Read",
+    "Mail.Read.Shared",
+]
+EMAIL_READ_WRITE_SCOPES = [
     "Mail.ReadWrite",
     "Mail.ReadWrite.Shared",
     "Mail.Send",
     "Mail.Send.Shared",
-]
-MINIMUM_REQUIRED_SCOPES = [
-    "User.Read",
-    "Calendars.ReadWrite",
-    "Mail.ReadWrite",
-    "Mail.Send",
 ]
 TOKEN_BACKEND = FileSystemTokenBackend(
     token_path=DEFAULT_CACHE_PATH, token_filename="o365.token"
@@ -151,6 +161,11 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional(CONF_CALENDARS, default=[]): [CALENDAR_SCHEMA],
                 vol.Optional(CONF_EMAIL_SENSORS): [EMAIL_SENSOR],
                 vol.Optional(CONF_QUERY_SENSORS): [QUERY_SENSOR],
+
+                vol.Optional(CONF_CALENDAR_READ, default=True): bool,
+                vol.Optional(CONF_CALENDAR_WRITE, default=True): bool,
+                vol.Optional(CONF_EMAIL_READ, default=True): bool,
+                vol.Optional(CONF_EMAIL_WRITE, default=True): bool,
             },
         )
     },
