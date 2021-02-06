@@ -21,6 +21,11 @@ class EventResponse(Enum):
     Tentative = "tentative"
     Decline = "decline"
 
+class FeatureAccess(Enum):
+    Disabled = "disabled"
+    Read = "read"
+    ReadWrite = "readwrite"
+
 
 ATTR_ATTACHMENTS = "attachments"
 ATTR_ATTENDEES = "attendees"
@@ -76,10 +81,10 @@ CONF_QUERY_SENSORS = "query_sensors"
 CONF_SUBJECT_CONTAINS = "subject_contains"
 CONF_SUBJECT_IS = "subject_is"
 CONF_TRACK_NEW = "track_new_calendar"
-CONF_CALENDAR_READ = "calendar_read"
-CONF_CALENDAR_WRITE = "calendar_write"
-CONF_EMAIL_READ = "email_read"
-CONF_EMAIL_WRITE = "email_write"
+
+CONF_CALENDAR_ACCESS = "calendar_access"
+CONF_EMAIL_ACCESS = "email_access"
+
 CONFIG_BASE_DIR = get_default_config_dir()
 CONFIGURATOR_DESCRIPTION = (
     "To link your O365 account, click the link, login, and authorize:"
@@ -162,10 +167,8 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional(CONF_EMAIL_SENSORS): [EMAIL_SENSOR],
                 vol.Optional(CONF_QUERY_SENSORS): [QUERY_SENSOR],
 
-                vol.Optional(CONF_CALENDAR_READ, default=True): bool,
-                vol.Optional(CONF_CALENDAR_WRITE, default=True): bool,
-                vol.Optional(CONF_EMAIL_READ, default=True): bool,
-                vol.Optional(CONF_EMAIL_WRITE, default=True): bool,
+                vol.Optional(CONF_CALENDAR_ACCESS, default='ReadWrite'): cv.enum(FeatureAccess),
+                vol.Optional(CONF_EMAIL_ACCESS, default='ReadWrite'): cv.enum(FeatureAccess)
             },
         )
     },

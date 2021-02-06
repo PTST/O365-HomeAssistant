@@ -13,7 +13,8 @@ from .const import (
     ATTR_ZIP_ATTACHMENTS,
     ATTR_ZIP_NAME,
     NOTIFY_BASE_SCHEMA,
-    CONF_EMAIL_WRITE,
+    CONF_EMAIL_ACCESS,
+    FeatureAccess,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ async def async_get_service(hass, config, discovery_info=None):
     if not is_authenticated:
         return
     conf = config.get(DOMAIN, {})
-    if not conf.get(CONF_EMAIL_WRITE, True):
+    if conf.get(CONF_EMAIL_ACCESS) is not FeatureAccess.ReadWrite:
         return
     email_service = O365EmailService(account)
     return email_service

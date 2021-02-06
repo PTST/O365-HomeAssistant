@@ -19,10 +19,9 @@ from .const import (
     CONF_TRACK,
     CONF_NAME,
     CONF_DEVICE_ID,
-    CONF_CALENDAR_READ,
-    CONF_CALENDAR_WRITE,
-    CONF_EMAIL_READ,
-    CONF_EMAIL_WRITE
+    CONF_CALENDAR_ACCESS,
+    CONF_EMAIL_ACCESS,
+    FeatureAccess,
 )
 from O365.calendar import Attendee
 from homeassistant.util import dt
@@ -45,17 +44,17 @@ def clean_html(html):
 def get_scopes(conf):
     scopes = [x for x in BASE_SCOPES]
 
-    if conf.get(CONF_CALENDAR_WRITE, True):
+    if conf.get(CONF_CALENDAR_ACCESS) is FeatureAccess.ReadWrite:
         scopes = scopes + CALENDAR_READ_WRITE_SCOPES
-    elif conf.get(CONF_CALENDAR_READ, True):
+    elif conf.get(CONF_CALENDAR_ACCESS) is FeatureAccess.Read:
         scopes = scopes + CALENDAR_READ_SCOPES
 
-    if conf.get(CONF_EMAIL_WRITE, True):
+    if conf.get(CONF_EMAIL_ACCESS) is FeatureAccess.ReadWrite:
         scopes = scopes + EMAIL_READ_WRITE_SCOPES
-    elif conf.get(CONF_EMAIL_READ, True):
+    elif conf.get(CONF_EMAIL_ACCESS) is FeatureAccess.Read:
         scopes = scopes + EMAIL_READ_SCOPES
 
-    _LOGGER.error(f"Required scopes: {scopes}")
+    _LOGGER.warning(f"Required scopes: {scopes}")
 
     return scopes
 

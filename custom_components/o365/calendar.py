@@ -28,8 +28,8 @@ from .const import (
     CONF_MAX_RESULTS,
     CALENDAR_ENTITY_ID_FORMAT,
     CONF_TRACK_NEW,
-    CONF_CALENDAR_READ,
-    CONF_CALENDAR_WRITE
+    CONF_CALENDAR_ACCESS,
+    FeatureAccess
 )
 from .utils import (
     clean_html,
@@ -54,7 +54,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         return False
 
     conf = config.get(DOMAIN, {})
-    if ((not conf.get(CONF_CALENDAR_READ, True)) and (not conf.get(CONF_CALENDAR_WRITE, True))):
+    if conf.get(CONF_CALENDAR_ACCESS) is not FeatureAccess.Disabled:
         return False
 
     calendar_services = CalendarServices(account, track_new, hass)
@@ -74,7 +74,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
             devices.append(cal)
     add_devices(devices, True)
 
-    if not conf.get(CONF_CALENDAR_WRITE, True):
+    if conf.get(CONF_CALENDAR_ACCESS) is FeatureAccess.ReadWrite:
         hass.services.register(
             DOMAIN, "modify_calendar_event", calendar_services.modify_calendar_event
         )
@@ -87,7 +87,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         hass.services.register(
             DOMAIN, "respond_calendar_event", calendar_services.respond_calendar_event
         )
-    if not conf.get(CONF_CALENDAR_READ, True):
+    if conf.get(CONF_CALENDAR_ACCESS) is not FeatureAccess.Disabled:
         hass.services.register(
             DOMAIN, "scan_for_calendars", calendar_services.scan_for_calendars
         )
