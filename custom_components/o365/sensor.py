@@ -14,6 +14,8 @@ from .const import (
     CONF_IS_UNREAD,
     CONF_EMAIL_SENSORS,
     CONF_QUERY_SENSORS,
+    CONF_EMAIL_ACCESS,
+    FeatureAccess,
 )
 from .utils import get_email_attributes
 
@@ -27,6 +29,10 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     account = hass.data[DOMAIN]["account"]
     is_authenticated = account.is_authenticated
     if not is_authenticated:
+        return False
+
+    conf = config.get(DOMAIN, {})
+    if conf.get(CONF_EMAIL_ACCESS) is FeatureAccess.Disabled:
         return False
 
     unread_sensors = hass.data[DOMAIN].get(CONF_EMAIL_SENSORS, [])

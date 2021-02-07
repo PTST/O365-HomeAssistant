@@ -16,7 +16,6 @@ from .const import (
     AUTH_CALLBACK_PATH,
     AUTH_CALLBACK_PATH_ALT,
     TOKEN_BACKEND,
-    SCOPE,
     CONF_CALENDARS,
     DEFAULT_NAME,
     CONFIGURATOR_LINK_NAME,
@@ -29,14 +28,16 @@ from .const import (
     CONF_TRACK_NEW,
 )
 
-from .utils import validate_permissions
+from .utils import (
+    validate_permissions, 
+    get_scopes
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 
 def setup(hass, config):
     """Set up the O365 platform."""
-    validate_permissions()
     conf = config.get(DOMAIN, {})
     CONFIG_SCHEMA(conf)
     credentials = (conf.get(CONF_CLIENT_ID), conf.get(CONF_CLIENT_SECRET))
@@ -51,10 +52,11 @@ def setup(hass, config):
 
     account = Account(credentials, token_backend=TOKEN_BACKEND)
     is_authenticated = account.is_authenticated
-    permissions = validate_permissions()
+    scopes = get_scopes(conf)
+    permissions = validate_permissions(scopes)
     if not is_authenticated or not permissions:
         url, state = account.con.get_authorization_url(
-            requested_scopes=SCOPE, redirect_uri=callback_url
+            requested_scopes=scopes, redirect_uri=callback_url
         )
         _LOGGER.info("no token; requesting authorization")
         callback_view = O365AuthCallbackView(
