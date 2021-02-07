@@ -122,6 +122,15 @@ EMAIL_READ_WRITE_SCOPES = [
     "Mail.Send",
     "Mail.Send.Shared",
 ]
+# Scopes that might not exist in the retrieved token
+IGNORABLE_SCOPES = [
+    "offline_access",
+    "Calendars.Read.Shared",
+    "Calendars.ReadWrite.Shared",
+    "Mail.Read.Shared",
+    "Mail.ReadWrite.Shared",
+    "Mail.Send.Shared",
+]
 TOKEN_BACKEND = FileSystemTokenBackend(
     token_path=DEFAULT_CACHE_PATH, token_filename="o365.token"
 )

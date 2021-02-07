@@ -11,6 +11,7 @@ from .const import (
     CALENDAR_READ_WRITE_SCOPES,
     EMAIL_READ_SCOPES,
     EMAIL_READ_WRITE_SCOPES,
+    IGNORABLE_SCOPES,
     CONFIG_BASE_DIR,
     DATETIME_FORMAT,
     CALENDAR_DEVICE_SCHEMA,
@@ -67,7 +68,8 @@ def validate_permissions(scopes, token_path=DEFAULT_CACHE_PATH, token_filename="
     with open(full_token_path, "r", encoding="UTF-8") as fh:
         raw = fh.read()
         permissions = json.loads(raw)["scope"]
-    all_permissions_granted = all([x in permissions for x in scopes])
+    mandatory_scopes = [x for x in scopes if x not in IGNORABLE_SCOPES]
+    all_permissions_granted = all([x in permissions for x in mandatory_scopes])
     if not all_permissions_granted:
         _LOGGER.warning(f"All permissions granted: {all_permissions_granted}")
     return all_permissions_granted
