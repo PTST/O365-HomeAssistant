@@ -6,7 +6,12 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from .const import (
     DEFAULT_CACHE_PATH,
-    MINIMUM_REQUIRED_SCOPES,
+    BASE_SCOPES,
+    CALENDAR_READ_SCOPES,
+    CALENDAR_READ_WRITE_SCOPES,
+    EMAIL_READ_SCOPES,
+    EMAIL_READ_WRITE_SCOPES,
+    IGNORABLE_SCOPES,
     CONFIG_BASE_DIR,
     DATETIME_FORMAT,
     CALENDAR_DEVICE_SCHEMA,
@@ -15,6 +20,9 @@ from .const import (
     CONF_TRACK,
     CONF_NAME,
     CONF_DEVICE_ID,
+    CONF_CALENDAR_ACCESS,
+    CONF_EMAIL_ACCESS,
+    FeatureAccess,
 )
 from O365.calendar import Attendee
 from homeassistant.util import dt
@@ -34,17 +42,34 @@ def clean_html(html):
     else:
         return html
 
+def get_scopes(conf):
+    scopes = [x for x in BASE_SCOPES]
 
-def validate_permissions(token_path=DEFAULT_CACHE_PATH, token_filename="o365.token"):
+    if conf.get(CONF_CALENDAR_ACCESS) is FeatureAccess.ReadWrite:
+        scopes += CALENDAR_READ_WRITE_SCOPES
+    elif conf.get(CONF_CALENDAR_ACCESS) is FeatureAccess.Read:
+        scopes += CALENDAR_READ_SCOPES
+
+    if conf.get(CONF_EMAIL_ACCESS) is FeatureAccess.ReadWrite:
+        scopes += EMAIL_READ_WRITE_SCOPES
+    elif conf.get(CONF_EMAIL_ACCESS) is FeatureAccess.Read:
+        scopes += EMAIL_READ_SCOPES
+
+    _LOGGER.warning(f"Required scopes: {scopes}")
+
+    return scopes
+
+
+def validate_permissions(scopes, token_path=DEFAULT_CACHE_PATH, token_filename="o365.token"):
     full_token_path = os.path.join(token_path, token_filename)
     if not os.path.exists(full_token_path) or not os.path.isfile(full_token_path):
-        _LOGGER.warning(f"Could not loacte token at {full_token_path}")
+        _LOGGER.warning(f"Could not locate token at {full_token_path}")
         return False
     with open(full_token_path, "r", encoding="UTF-8") as fh:
         raw = fh.read()
         permissions = json.loads(raw)["scope"]
-    scope = [x for x in MINIMUM_REQUIRED_SCOPES]
-    all_permissions_granted = all([x in permissions for x in scope])
+    mandatory_scopes = [x for x in scopes if x not in IGNORABLE_SCOPES]
+    all_permissions_granted = all(x in permissions for x in mandatory_scopes)
     if not all_permissions_granted:
         _LOGGER.warning(f"All permissions granted: {all_permissions_granted}")
     return all_permissions_granted
@@ -191,7 +216,7 @@ def load_calendars(path):
 
 def get_calendar_info(hass, calendar, track_new_devices):
     """Convert data from O365 into DEVICE_SCHEMA."""
-    calendar_info = CALENDAR_DEVICE_SCHEMA(
+    return CALENDAR_DEVICE_SCHEMA(
         {
             CONF_CAL_ID: calendar.calendar_id,
             CONF_ENTITIES: [
@@ -203,7 +228,6 @@ def get_calendar_info(hass, calendar, track_new_devices):
             ],
         }
     )
-    return calendar_info
 
 
 def update_calendar_file(path, calendar, hass, track_new_devices):
