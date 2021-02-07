@@ -46,14 +46,14 @@ def get_scopes(conf):
     scopes = [x for x in BASE_SCOPES]
 
     if conf.get(CONF_CALENDAR_ACCESS) is FeatureAccess.ReadWrite:
-        scopes = scopes + CALENDAR_READ_WRITE_SCOPES
+        scopes += CALENDAR_READ_WRITE_SCOPES
     elif conf.get(CONF_CALENDAR_ACCESS) is FeatureAccess.Read:
-        scopes = scopes + CALENDAR_READ_SCOPES
+        scopes += CALENDAR_READ_SCOPES
 
     if conf.get(CONF_EMAIL_ACCESS) is FeatureAccess.ReadWrite:
-        scopes = scopes + EMAIL_READ_WRITE_SCOPES
+        scopes += EMAIL_READ_WRITE_SCOPES
     elif conf.get(CONF_EMAIL_ACCESS) is FeatureAccess.Read:
-        scopes = scopes + EMAIL_READ_SCOPES
+        scopes += EMAIL_READ_SCOPES
 
     _LOGGER.warning(f"Required scopes: {scopes}")
 
@@ -69,7 +69,7 @@ def validate_permissions(scopes, token_path=DEFAULT_CACHE_PATH, token_filename="
         raw = fh.read()
         permissions = json.loads(raw)["scope"]
     mandatory_scopes = [x for x in scopes if x not in IGNORABLE_SCOPES]
-    all_permissions_granted = all([x in permissions for x in mandatory_scopes])
+    all_permissions_granted = all(x in permissions for x in mandatory_scopes)
     if not all_permissions_granted:
         _LOGGER.warning(f"All permissions granted: {all_permissions_granted}")
     return all_permissions_granted
@@ -216,7 +216,7 @@ def load_calendars(path):
 
 def get_calendar_info(hass, calendar, track_new_devices):
     """Convert data from O365 into DEVICE_SCHEMA."""
-    calendar_info = CALENDAR_DEVICE_SCHEMA(
+    return CALENDAR_DEVICE_SCHEMA(
         {
             CONF_CAL_ID: calendar.calendar_id,
             CONF_ENTITIES: [
@@ -228,7 +228,6 @@ def get_calendar_info(hass, calendar, track_new_devices):
             ],
         }
     )
-    return calendar_info
 
 
 def update_calendar_file(path, calendar, hass, track_new_devices):

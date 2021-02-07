@@ -30,8 +30,7 @@ async def async_get_service(hass, config, discovery_info=None):
     conf = config.get(DOMAIN, {})
     if conf.get(CONF_EMAIL_ACCESS) is not FeatureAccess.ReadWrite:
         return
-    email_service = O365EmailService(account)
-    return email_service
+    return O365EmailService(account)
 
 
 class O365EmailService(BaseNotificationService):

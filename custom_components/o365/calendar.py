@@ -262,15 +262,13 @@ class O365CalendarData:
     @staticmethod
     def get_end_date(obj):
         if hasattr(obj, "end"):
-            enddate = obj.end
+            return obj.end
 
         elif hasattr(obj, "duration"):
-            enddate = obj.start + obj.duration.value
+            return obj.start + obj.duration.value
 
         else:
-            enddate = obj.start + timedelta(days=1)
-
-        return enddate
+            return obj.start + timedelta(days=1)
 
 
 class CalendarServices:
