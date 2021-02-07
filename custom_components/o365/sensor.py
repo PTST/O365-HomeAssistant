@@ -15,6 +15,7 @@ from .const import (
     CONF_EMAIL_SENSORS,
     CONF_QUERY_SENSORS,
     CONF_EMAIL_ACCESS,
+    FeatureAccess,
 )
 from .utils import get_email_attributes
 
