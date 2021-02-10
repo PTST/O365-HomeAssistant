@@ -39,6 +39,7 @@ Under "Api Permissions" add the following delegated permission from the Microsof
 * Mail.ReadWrite.Shared - *Read and write user and shared mail*
 * Mail.Send - *Send mail as a user*
 * Mail.Send.Shared - *Send mail on behalf of others*
+* Presence.Read - *Allow access to teams status*
 
 ## Adding to Home Assistant
 
