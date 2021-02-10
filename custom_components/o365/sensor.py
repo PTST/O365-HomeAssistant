@@ -39,6 +39,8 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         sensor = O365QuerySensor(account, conf)
         add_devices([sensor], True)
 
+    teamsStatusSensor = O365TeamsStatusSensor(account, conf)
+    add_devices([teamsStatusSensor], True)
 
 class O365QuerySensor(Entity):
     def __init__(self, account, conf):
@@ -183,3 +185,26 @@ class O365InboxSensor(Entity):
         self._state = len(mails)
         # self._attributes = {"data": attrs, "data_str_repr": json.dumps(attrs)}
         self._attributes = {"data": attrs}
+
+class O365TeamsStatusSensor(Entity):
+    def __init__(self, account, conf):
+        self.account = account
+        self.teams = account.teams()
+        self._name = f"{self.account.get_current_user().mail}-teams status"
+        self._state = 0
+        self._attributes = {}
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def state(self):
+        return self._state
+
+    @property
+    def device_state_attributes(self):
+        return self._attributes
+    
+    def update(self):
+        self._state = self.teams.get_my_presence().activity
