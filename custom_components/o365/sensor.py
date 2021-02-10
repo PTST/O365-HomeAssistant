@@ -190,9 +190,7 @@ class O365TeamsStatusSensor(Entity):
     def __init__(self, account, conf):
         self.account = account
         self.teams = account.teams()
-        self._name = conf.get(
-            CONF_NAME, f"{self.account.get_current_user().mail}-teams status"
-        )
+        self._name = f"{self.account.get_current_user().mail}-teams status"
         self._state = 0
         self._attributes = {}
 
