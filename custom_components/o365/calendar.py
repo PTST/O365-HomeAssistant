@@ -1,7 +1,9 @@
 import logging
 import copy
 from operator import attrgetter, itemgetter
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, tzinfo
+from pytz import timezone
+import pytz
 from homeassistant.util import Throttle, dt
 from homeassistant.components.calendar import (
     CalendarEventDevice,
@@ -191,8 +193,12 @@ class O365CalendarData:
         event_list = []
         for event in vevent_list:
             data = format_event_data(event, self.calendar.calendar_id)
-            data["start"] = self.get_hass_date(data["start"])
-            data["end"] = self.get_hass_date(data["end"])
+            if not data["is_all_day"]:
+                data["start"] = self.get_hass_date(data["start"])
+                data["end"] = self.get_hass_date(data["end"])
+            else:             
+                data["start"] = self.get_hass_date(data["start"].astimezone(pytz.utc).date()) 
+                data["end"] = self.get_hass_date((data["end"].astimezone(pytz.utc).date())) 
             event_list.append(data)
 
         return event_list
@@ -249,20 +255,19 @@ class O365CalendarData:
             if obj.tzinfo is None:
                 return obj.replace(tzinfo=dt.DEFAULT_TIME_ZONE)
             return obj
-        return dt.as_local(dt.dt.datetime.combine(obj, dt.dt.time.min))
-
+        return dt.dt.datetime.combine(obj, dt.dt.time.min).replace(
+            tzinfo=dt.DEFAULT_TIME_ZONE
+        )
     @staticmethod
     def get_end_date(obj):
         if hasattr(obj, "end"):
-            enddate = obj.end
+            return obj.end
 
         elif hasattr(obj, "duration"):
-            enddate = obj.start + obj.duration.value
+            return obj.start + obj.duration.value
 
         else:
-            enddate = obj.start + timedelta(days=1)
-
-        return enddate
+            return obj.start + timedelta(days=1)
 
 
 class CalendarServices:
