@@ -131,7 +131,7 @@ Key | Type | Required | Description
 
 ## Calendar configuration
 This component has changed to now using an external o365_calendars.yaml file, this is done to align this component more with the official Google Calendar Event integration.
-### example o365_calendar.yaml:
+### example o365_calendars.yaml:
 ```yaml
 - cal_id: xxxx
   entities:
